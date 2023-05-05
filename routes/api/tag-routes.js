@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const { Tag, Product, ProductTag } = require('../../models');
 
-// The `/api/tags` endpoint
 
 router.get('/', async (req, res) => {
   try {
@@ -37,7 +36,11 @@ router.get('/:id', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-  Tag.create(req.body)
+  Tag.create(req.body, {
+    where:{
+      id:req.params.id
+    }
+  })
   .then(tags=>res.json(tags)).catch(err=>{
     console.log(err);
     res.status(500).json({msg:"error occurred",err})
@@ -45,11 +48,26 @@ router.post('/', (req, res) => {
 });
 
 router.put('/:id', (req, res) => {
-  // update a tag's name by its `id` value
+  Tagupdate(req.body, {
+    where:{
+      id:req.params.id
+    }
+  })
+  .then(tags=>res.json(tags)).catch(err=>{
+    console.log(err);
+    res.status(500).json({msg:"error occurred",err})
+  });
 });
 
 router.delete('/:id', (req, res) => {
-  // delete on tag by its `id` value
+  Tag.destroy({
+    where:{
+      id:req.params.id
+    }
+  })
+  .then(tags=>res.json(tags)).catch(err=>{
+    console.log(err);
+    res.status(500).json({msg:"error occurred",err})
+  });
 });
-
 module.exports = router;
