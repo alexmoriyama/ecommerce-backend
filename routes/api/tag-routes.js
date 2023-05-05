@@ -3,18 +3,45 @@ const { Tag, Product, ProductTag } = require('../../models');
 
 // The `/api/tags` endpoint
 
-router.get('/', (req, res) => {
-  // find all tags
-  // be sure to include its associated Product data
+router.get('/', async (req, res) => {
+  try {
+    const tags= await Tag.findAll ({
+      include: [{
+          model:Product,through:ProductTag
+        }],
+    }); 
+  res.json(tags)
+} catch(err){
+  console.log(err);
+  res.status(500).json({msg:"error occurred",err})
+}
 });
 
 router.get('/:id', (req, res) => {
-  // find a single tag by its `id`
-  // be sure to include its associated Product data
+  Tag.findOne({
+    where:{
+      id:req.params.id
+    },
+    include: [{
+      model:Product,through:ProductTag
+    }],
+  }).then(tags=>{
+    if(!tags){
+        return res.status(404).json({msg:"no tag with that id in database!"})
+    }
+    res.json(tags)
+}).catch(err=>{
+    console.log(err);
+    res.status(500).json({msg:"error occurred",err})
+})
 });
 
 router.post('/', (req, res) => {
-  // create a new tag
+  Tag.create(req.body)
+  .then(tags=>res.json(tags)).catch(err=>{
+    console.log(err);
+    res.status(500).json({msg:"error occurred",err})
+  });
 });
 
 router.put('/:id', (req, res) => {
